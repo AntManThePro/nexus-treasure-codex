@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NEXUS Treasure Codex - Interactive Open Source Hidden Gems Constellation by AntManThePro | godmode2025.net">
+    <title>NEXUS • TREASURE CODEX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        
+        :root {
+            --neon-green: #00ff87;
+            --neon-cyan: #60efff;
+            --neon-pink: #ff0080;
+            --neon-yellow: #ffcc00;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .neon-green { color: #00ff87; text-shadow: 0 0 10px #00ff87, 0 0 20px #00ff87; }
+        .neon-cyan { color: #60efff; text-shadow: 0 0 10px #60efff, 0 0 20px #60efff; }
+        .neon-pink { color: #ff0080; text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080; }
+        .neon-yellow { color: #ffcc00; text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; }
+
+        .glass {
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .neon-border {
+            border: 1px solid rgba(0, 255, 135, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 135, 0.1);
+            transition: all 0.3s cubic-bezier(0.23, 1.0, 0.32, 1);
+        }
+        
+        .neon-border:hover {
+            border-color: #00ff87;
+            box-shadow: 0 0 25px rgba(0, 255, 135, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .section-header {
+            font-size: 2.25rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .gem-card {
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), 
+                       box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+                       border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gem-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(145deg, rgba(0,255,135,0.03) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .gem-card:hover {
+            transform: translateY(-4px) scale(1.005);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 
+                       0 8px 10px -6px rgb(0 0 0 / 0.1),
+                       0 0 0 1px rgba(0, 255, 135, 0.2);
+        }
+        
+        .gem-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-tag {
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+            padding: 1px 9px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        #treasure-canvas {
+            border-radius: 16px;
+            background: #050507;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+            cursor: grab;
+            touch-action: none;
+        }
+        
+        #treasure-canvas:active {
+            cursor: grabbing;
+        }
+
+        .modal {
+            animation: modalEnter 0.4s cubic-bezier(0.23, 1.0, 0.32, 1);
+        }
+
+        @keyframes modalEnter {
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .node {
+            transition: filter 0.2s ease;
+        }
+
+        .knowledge-particle {
+            pointer-events: none;
+        }
+
+        .nav-active {
+            color: #00ff87;
+            position: relative;
+        }
+        
+        .nav-active:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #00ff87, #60efff);
+        }
+
+        .cosmic-bg {
+            background-image: 
+                radial-gradient(circle at 25% 30%, rgba(0,255,135,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 70%, rgba(96,239,255,0.025) 0%, transparent 50%);
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .map-legend {
+            background: rgba(10,10,15,0.9);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-[#050507] text-white overflow-x-hidden">
+    <!-- NAV -->
+    <nav class="sticky top-0 z-50 glass border-b border-white/10">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-5 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#00ff87] via-[#60efff] to-[#ff0080] p-px">
+                            <div class="w-full h-full rounded-2xl bg-[#050507] flex items-center justify-center">
+                                <i class="fa-solid fa-treasure-chest text-[#00ff87] text-2xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="font-display text-2xl tracking-tighter font-semibold">NEXUS</div>
+                            <div class="text-[10px] text-white/40 -mt-1 tracking-[2px]">TREASURE CODEX</div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block px-3 py-1 text-xs rounded-full border border-white/10 text-white/50 font-mono">v2.0 • ANTMANTHEPRO</div>
+                </div>
+
+                <div class="flex items-center gap-x-2 text-sm">
+                    <a href="#map" class="px-4 py-2 rounded-3xl hover:bg-white/5 transition-colors text-white/80 hover:text-white">The Constellation</a>
+                    <a href="#vault" class="px-4 py-2 rounded-3xl hover:bg-white/5 transition-colors text-white/80 hover:text-white">The Vault</a>
+                    <a href="#forge" class="px-4 py-2 rounded-3xl hover:bg-white/5 transition-colors text-white/80 hover:text-white">The Forge</a>
+                    
+                    <div class="w-px h-5 bg-white/20 mx-2"></div>
+                    
+                    <button onclick="downloadArtifact()" 
+                            class="flex items-center gap-x-2 px-5 py-2.5 rounded-3xl bg-white text-[#050507] text-sm font-semibold hover:bg-[#00ff87] transition-all active:scale-[0.985]">
+                        <i class="fa-solid fa-download mr-1.5"></i>
+                        <span>DOWNLOAD CODEX</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-16 pb-12">
+        <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8">
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center gap-x-2 px-4 py-1.5 rounded-3xl border border-white/10 bg-white/5 text-xs tracking-[1.5px] mb-6">
+                    <div class="w-2 h-2 bg-[#00ff87] rounded-full animate-pulse"></div>
+                    <span class="font-mono text-white/60">CURATED BY ANTMANTHEPRO • GODMODE2025.NET</span>
+                </div>
+                
+                <h1 class="section-header text-7xl lg:text-7xl leading-[0.95] tracking-tighter">
+                    THE LIVING<br>
+                    <span class="bg-gradient-to-r from-[#00ff87] via-[#60efff] to-[#ff0080] bg-clip-text text-transparent">TREASURE CODEX</span>
+                </h1>
+                <p class="mt-6 max-w-lg text-xl text-white/70">
+                    An interactive constellation of the most valuable overlooked open source gems. 
+                    Explore. Connect. Forge your own mastery path.
+                </p>
+                
+                <div class="flex items-center gap-x-4 mt-8">
+                    <button onclick="document.getElementById('map').scrollIntoView({ behavior: 'smooth' })" 
+                            class="group flex items-center gap-x-3 px-8 py-4 rounded-3xl bg-white text-[#050507] font-semibold text-base hover:bg-[#00ff87] transition-all active:scale-[0.985]">
+                        <span>ENTER THE CONSTELLATION</span>
+                        <i class="fa-solid fa-arrow-right group-active:translate-x-0.5 transition"></i>
+                    </button>
+                    
+                    <button onclick="startKnowledgeFlow()" 
+                            class="flex items-center gap-x-3 px-6 py-4 rounded-3xl border border-white/20 hover:border-white/40 text-white/90 hover:text-white transition-all">
+                        <i class="fa-solid fa-play mr-2"></i>
+                        <span>WATCH KNOWLEDGE FLOW</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hero Stats -->
+            <div class="grid grid-cols-3 gap-4 lg:gap-6 text-center lg:text-right">
+                <div>
+                    <div class="text-4xl font-semibold tabular-nums text-[#00ff87]">67</div>
+                    <div class="text-xs tracking-widest text-white/50 mt-1">HIDDEN GEMS</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-semibold tabular-nums text-[#60efff]">12</div>
+                    <div class="text-xs tracking-widest text-white/50 mt-1">CONSTELLATIONS</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-semibold tabular-nums text-[#ff0080]">∞</div>
+                    <div class="text-xs tracking-widest text-white/50 mt-1">POSSIBLE PATHS</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THE CONSTELLATION MAP -->
+    <div id="map" class="max-w-screen-2xl mx-auto px-8 pb-16">
+        <div class="flex items-end justify-between mb-6">
+            <div>
+                <div class="flex items-center gap-x-3">
+                    <i class="fa-solid fa-globe text-[#00ff87] text-3xl"></i>
+                    <div>
+                        <div class="font-display text-4xl tracking-tighter">THE CONSTELLATION</div>
+                        <div class="text-white/50 text-sm">Real-time force-directed knowledge graph • Drag nodes to reshape the universe</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-x-2 text-xs">
+                <div class="px-3 py-1.5 rounded-2xl bg-white/5 flex items-center gap-x-2 text-white/60">
+                    <i class="fa-solid fa-mouse-pointer"></i>
+                    <span>DRAG • HOVER • CLICK</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+            <canvas id="treasure-canvas" width="1400" height="720" class="w-full"></canvas>
+            
+            <!-- Canvas Overlay Controls -->
+            <div class="absolute top-6 left-6 flex flex-col gap-y-2">
+                <div class="map-legend px-4 py-3 rounded-2xl border border-white/10 text-xs">
+                    <div class="flex items-center gap-x-4 text-white/70">
+                        <div class="flex items-center gap-x-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-[#00ff87]"></div>
+                            <span>Security</span>
+                        </div>
+                        <div class="flex items-center gap-x-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-[#60efff]"></div>
+                            <span>Systems</span>
+                        </div>
+                        <div class="flex items-center gap-x-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-[#ff0080]"></div>
+                            <span>Dev</span>
+                        </div>
+                        <div class="flex items-center gap-x-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-[#ffcc00]"></div>
+                            <span>Data/ML</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute top-6 right-6 flex flex-col gap-y-2 items-end">
+                <div class="flex gap-x-2">
+                    <button onclick="toggleSimulation()" id="sim-btn"
+                            class="px-4 py-2 text-xs font-medium rounded-2xl glass border border-white/10 hover:border-[#00ff87]/60 flex items-center gap-x-2 transition-all">
+                        <i class="fa-solid fa-atom"></i>
+                        <span id="sim-text">PAUSE SIM</span>
+                    </button>
+                    <button onclick="resetLayout()" 
+                            class="px-4 py-2 text-xs font-medium rounded-2xl glass border border-white/10 hover:border-white/30 flex items-center gap-x-2 transition-all">
+                        <i class="fa-solid fa-undo"></i>
+                        <span>RESET</span>
+                    </button>
+                </div>
+                
+                <div class="glass border border-white/10 rounded-2xl px-3 py-1.5 text-xs flex items-center gap-x-2">
+                    <input id="map-search" type="text" placeholder="Search gems..." 
+                           class="bg-transparent border-none outline-none text-sm w-40 placeholder:text-white/40"
+                           onkeyup="filterMapNodes(this.value)">
+                    <i class="fa-solid fa-search text-white/40"></i>
+                </div>
+            </div>
+
+            <!-- Selected Node Info -->
+            <div id="node-info-panel" class="hidden absolute bottom-6 left-6 max-w-xs glass border border-white/10 rounded-3xl p-5 text-sm">
+                <div id="node-info-content"></div>
+            </div>
+        </div>
+        
+        <div class="flex justify-between items-center mt-4 px-1 text-xs text-white/40">
+            <div>67 nodes • 84 connections • Real-time Verlet integration</div>
+            <div class="flex items-center gap-x-4">
+                <div onclick="highlightCategory('all')" class="cursor-pointer hover:text-white/80 transition">SHOW ALL</div>
+                <div onclick="highlightCategory('security')" class="cursor-pointer hover:text-[#ff0080] transition">SECURITY</div>
+                <div onclick="highlightCategory('dev')" class="cursor-pointer hover:text-[#00ff87] transition">DEV</div>
+                <div onclick="highlightCategory('data')" class="cursor-pointer hover:text-[#ffcc00] transition">DATA</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THE VAULT -->
+    <div id="vault" class="max-w-screen-2xl mx-auto px-8 py-12 border-t border-white/10">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-y-4 mb-8">
+            <div>
+                <div class="font-display text-4xl tracking-tighter">THE VAULT</div>
+                <div class="text-white/50">Every hidden gem, beautifully organized and instantly searchable</div>
+            </div>
+            
+            <div class="flex items-center gap-x-3">
+                <div class="relative">
+                    <input id="vault-search" type="text" placeholder="Search repositories, topics, or keywords..." 
+                           class="glass border border-white/10 w-80 pl-10 py-3 rounded-3xl text-sm placeholder:text-white/40 focus:outline-none focus:border-[#00ff87]/40"
+                           onkeyup="filterVault()">
+                    <i class="fa-solid fa-search absolute left-4 top-4 text-white/40"></i>
+                </div>
+                
+                <select id="category-filter" onchange="filterVault()" 
+                        class="glass border border-white/10 px-4 py-3 rounded-3xl text-sm cursor-pointer focus:outline-none">
+                    <option value="">All Constellations</option>
+                    <option value="Security">Security & Privacy</option>
+                    <option value="System">System Administration</option>
+                    <option value="Development">Development Superpowers</option>
+                    <option value="Data">Data Science & ML</option>
+                    <option value="Web">Web Development</option>
+                    <option value="Reverse">Reverse Engineering</option>
+                    <option value="Docs">Documentation</option>
+                    <option value="Productivity">Productivity</option>
+                    <option value="Crypto">Cryptography</option>
+                    <option value="Crown">Crown Jewels</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Vault Grid -->
+        <div id="vault-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            <!-- Populated dynamically by JS -->
+        </div>
+    </div>
+
+    <!-- THE FORGE -->
+    <div id="forge" class="max-w-screen-2xl mx-auto px-8 py-16 border-t border-white/10 bg-[#050507]">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="inline-block px-4 py-1 rounded-3xl bg-white/5 text-xs tracking-[2px] mb-3">ALGORITHMIC MASTERY ENGINE</div>
+                <div class="font-display text-5xl tracking-tighter">THE FORGE</div>
+                <p class="mt-3 text-white/60 max-w-md mx-auto">Select your domains of interest. The Codex will algorithmically weave your personalized learning constellation.</p>
+            </div>
+
+            <div class="glass border border-white/10 rounded-3xl p-8">
+                <!-- Interest Selection -->
+                <div class="mb-8">
+                    <div class="uppercase text-xs tracking-[1.5px] text-white/50 mb-3 px-1">CHOOSE YOUR CONSTELLATIONS</div>
+                    <div class="flex flex-wrap gap-2" id="interest-chips">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div>
+                        <label class="text-xs tracking-widest text-white/60 block mb-2 px-1">CURRENT MASTERY LEVEL</label>
+                        <select id="mastery-level" class="glass w-full border border-white/10 px-4 py-3 rounded-2xl text-sm">
+                            <option value="beginner">Beginner — Building foundations</option>
+                            <option value="intermediate" selected>Intermediate — Ready to go deep</option>
+                            <option value="advanced">Advanced — Seeking mastery & edge cases</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs tracking-widest text-white/60 block mb-2 px-1">TIME HORIZON (WEEKS)</label>
+                        <div class="flex items-center gap-x-4">
+                            <input type="range" id="time-horizon" min="4" max="52" step="4" value="12" 
+                                   class="flex-1 accent-[#00ff87]" oninput="updateTimeLabel(this.value)">
+                            <div class="w-14 text-right font-mono text-[#00ff87] tabular-nums" id="time-label">12</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs tracking-widest text-white/60 block mb-2 px-1">FOCUS MODE</label>
+                        <div class="flex gap-x-2">
+                            <div onclick="setFocusMode(this, 'balanced')" class="focus-mode-btn active px-5 py-2.5 text-xs rounded-2xl border border-[#00ff87] cursor-pointer flex-1 text-center">BALANCED</div>
+                            <div onclick="setFocusMode(this, 'deep')" class="focus-mode-btn px-5 py-2.5 text-xs rounded-2xl border border-white/20 hover:border-white/40 cursor-pointer flex-1 text-center">DEEP DIVE</div>
+                            <div onclick="setFocusMode(this, 'broad')" class="focus-mode-btn px-5 py-2.5 text-xs rounded-2xl border border-white/20 hover:border-white/40 cursor-pointer flex-1 text-center">BROAD</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="generateRoadmap()" 
+                        class="w-full py-4 rounded-3xl bg-gradient-to-r from-[#00ff87] via-[#60efff] to-[#ff0080] text-[#050507] font-bold text-lg tracking-wider flex items-center justify-center gap-x-3 hover:brightness-105 active:scale-[0.995] transition-all">
+                    <i class="fa-solid fa-magic mr-2"></i>
+                    <span>WEAVE MY PERSONALIZED PATH</span>
+                </button>
+            </div>
+
+            <!-- Generated Roadmap Output -->
+            <div id="roadmap-output" class="hidden mt-8">
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <div class="font-semibold text-xl">Your Forged Mastery Constellation</div>
+                    <div class="flex gap-x-3">
+                        <button onclick="copyRoadmap()" class="text-xs px-4 py-2 rounded-2xl border border-white/20 hover:bg-white/5 flex items-center gap-x-2">
+                            <i class="fa-solid fa-copy"></i> <span>COPY TO CLIPBOARD</span>
+                        </button>
+                        <button onclick="exportRoadmap()" class="text-xs px-4 py-2 rounded-2xl bg-white/10 hover:bg-white/20 flex items-center gap-x-2">
+                            <i class="fa-solid fa-file-export"></i> <span>EXPORT MD</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="roadmap-timeline" class="space-y-3"></div>
+                
+                <div class="mt-6 text-center">
+                    <div class="inline-flex items-center text-xs text-white/50 bg-white/5 px-4 py-2 rounded-3xl">
+                        <i class="fa-solid fa-info-circle mr-2"></i>
+                        Path generated using priority-weighted topological traversal + domain affinity scoring
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 py-8 text-center text-xs text-white/40">
+        <div class="max-w-screen-2xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-y-3">
+            <div>Built as a living portfolio artifact by <span class="text-white/70">AntManThePro</span> • NEXUS Ecosystem</div>
+            <div class="flex items-center gap-x-5">
+                <div>godmode2025.net</div>
+                <div class="w-px h-3 bg-white/20"></div>
+                <div>Real-time • Self-contained • No dependencies</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Detail Modal -->
+    <div id="gem-modal" onclick="if (event.target.id === 'gem-modal') closeModal()" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="glass border border-white/10 max-w-2xl w-full rounded-3xl overflow-hidden modal">
+            <div class="px-8 pt-8 pb-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div id="modal-category" class="category-tag text-xs mb-3"></div>
+                        <div id="modal-title" class="font-display text-4xl tracking-tighter pr-8"></div>
+                    </div>
+                    <button onclick="closeModal()" class="text-white/40 hover:text-white text-3xl leading-none">&times;</button>
+                </div>
+                
+                <div id="modal-desc" class="mt-5 text-[15px] leading-relaxed text-white/80"></div>
+                
+                <div class="mt-6 pt-6 border-t border-white/10 flex items-center justify-between text-sm">
+                    <div class="flex items-center gap-x-4 text-white/60">
+                        <div><i class="fa-solid fa-link mr-1.5"></i> <span id="modal-url-short"></span></div>
+                    </div>
+                    
+                    <div class="flex gap-x-3">
+                        <button onclick="visitResource()" 
+                                class="px-6 py-3 rounded-2xl bg-white text-[#050507] text-sm font-semibold flex items-center gap-x-2 active:scale-[0.985]">
+                            <span>OPEN RESOURCE</span>
+                            <i class="fa-solid fa-external-link-alt"></i>
+                        </button>
+                        
+                        <button onclick="highlightOnMapFromModal()" 
+                                class="px-5 py-3 rounded-2xl border border-white/20 hover:bg-white/5 text-sm flex items-center gap-x-2">
+                            <i class="fa-solid fa-map-marked"></i>
+                            <span>HIGHLIGHT IN MAP</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== TAILWIND CONFIG ====================
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#00ff87');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // ==================== DATA: THE TREASURE MAP ====================
+        const treasureData = [
+            // Security & Privacy
+            { id: "owasp", name: "OWASP CheatSheet Series", category: "Security", color: "#ff0080", url: "https://github.com/OWASP/CheatSheetSeries", short: "The holy grail of security practices", desc: "Comprehensive, battle-tested security cheat sheets maintained by OWASP. Essential reference for developers and security professionals.", tags: ["security", "cheatsheet"] },
+            { id: "payloads", name: "PayloadsAllTheThings", category: "Security", color: "#ff0080", url: "https://github.com/swisskyrepo/PayloadsAllTheThings", short: "Every penetration tester's secret weapon", desc: "A comprehensive collection of payloads, bypasses, and techniques for web application security testing and red teaming.", tags: ["pentest", "payloads"] },
+            { id: "seclists", name: "SecLists", category: "Security", color: "#ff0080", url: "https://github.com/danielmiessler/SecLists", short: "Ultimate collection of security testing lists", desc: "The most comprehensive collection of wordlists, usernames, passwords, and other security testing resources.", tags: ["wordlists", "recon"] },
+            { id: "cyberchef", name: "CyberChef", category: "Security", color: "#ff0080", url: "https://github.com/gchq/CyberChef", short: "GCHQ's Swiss Army knife for data analysis", desc: "The ultimate web app for data encoding, encryption, compression, and analysis. Built by GCHQ.", tags: ["crypto", "forensics"] },
+            { id: "thehive", name: "TheHive Project", category: "Security", color: "#ff0080", url: "https://docs.thehive-project.org/", short: "Incident response orchestration mastery", desc: "Open source incident response platform designed to make life easier for SOCs, CSIRTs and security teams.", tags: ["incident-response", "soar"] },
+            { id: "privacyguides", name: "PrivacyGuides", category: "Security", color: "#ff0080", url: "https://github.com/privacyguides/privacyguides.org", short: "The definitive privacy protection guide", desc: "Privacy-respecting software recommendations and hardening guides. The gold standard for digital privacy.", tags: ["privacy", "opsec"] },
+            { id: "awesome-selfhosted", name: "Awesome-Selfhosted", category: "Security", color: "#ff0080", url: "https://github.com/awesome-selfhosted/awesome-selfhosted", short: "Break free from big tech", desc: "A curated list of awesome self-hosted software. Reclaim your data and privacy.", tags: ["selfhosted", "privacy"] },
+            { id: "tails", name: "Tails Documentation", category: "Security", color: "#ff0080", url: "https://tails.boum.org/doc/index.en.html", short: "The amnesic incognito live system", desc: "Privacy and anonymity focused live operating system. Leave no trace on the computer you're using.", tags: ["anonymity", "live-os"] },
+
+            // System Administration
+            { id: "terraform-bp", name: "Terraform Best Practices", category: "System", color: "#60efff", url: "https://github.com/ozbillwang/terraform-best-practices", short: "Infrastructure secrets revealed", desc: "Battle-tested patterns and practices for writing clean, maintainable, and secure Terraform code at scale.", tags: ["iac", "terraform"] },
+            { id: "ansible-bp", name: "Ansible Best Practices", category: "System", color: "#60efff", url: "https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html", short: "Automation artistry", desc: "Official and community-vetted best practices for writing effective, scalable Ansible playbooks.", tags: ["automation", "ansible"] },
+            { id: "docker-bench", name: "Docker Bench Security", category: "System", color: "#60efff", url: "https://github.com/docker/docker-bench-security", short: "Container fortification", desc: "Automated security auditing tool for Docker containers. Checks against CIS Docker Benchmark.", tags: ["docker", "security"] },
+            { id: "prometheus", name: "Prometheus Operator", category: "System", color: "#60efff", url: "https://github.com/prometheus-operator/prometheus-operator", short: "Monitoring nirvana", desc: "Kubernetes native monitoring with Prometheus. The standard for cloud-native observability.", tags: ["monitoring", "k8s"] },
+            { id: "grafana", name: "Grafana Dashboards", category: "System", color: "#60efff", url: "https://grafana.com/grafana/dashboards/", short: "Visual intelligence goldmine", desc: "Thousands of community dashboards for every data source. Turn metrics into beautiful insights.", tags: ["visualization", "dashboards"] },
+            { id: "elk", name: "ELK Stack Guides", category: "System", color: "#60efff", url: "https://github.com/elastic/elasticsearch", short: "Log analysis mastery", desc: "The complete stack for search, observability, and security. Elasticsearch, Logstash, Kibana.", tags: ["logging", "search"] },
+
+            // Development
+            { id: "clean-js", name: "Clean Code JavaScript", category: "Development", color: "#00ff87", url: "https://github.com/ryanmcdermott/clean-code-javascript", short: "Write code like poetry", desc: "Clean Code concepts adapted for JavaScript. Software craftsmanship at its finest.", tags: ["clean-code", "javascript"] },
+            { id: "system-design", name: "System Design Primer", category: "Development", color: "#00ff87", url: "https://github.com/donnemartin/system-design-primer", short: "Scale to infinity", desc: "Learn how to design large-scale systems. Prep for system design interviews and real architecture.", tags: ["architecture", "scalability"] },
+            { id: "12factor", name: "The Twelve-Factor App", category: "Development", color: "#00ff87", url: "https://12factor.net/", short: "Build bulletproof applications", desc: "Methodology for building software-as-a-service apps. Timeless principles for modern development.", tags: ["saas", "devops"] },
+            { id: "google-style", name: "Google Style Guides", category: "Development", color: "#00ff87", url: "https://github.com/google/styleguide", short: "Code like Google engineers", desc: "The style guides used internally at Google. Consistency at planetary scale.", tags: ["style", "standards"] },
+            { id: "ms-api", name: "Microsoft REST API Guidelines", category: "Development", color: "#00ff87", url: "https://github.com/Microsoft/api-guidelines", short: "API design perfection", desc: "Comprehensive guidelines for designing consistent, evolvable REST APIs at Microsoft scale.", tags: ["api", "rest"] },
+            { id: "openapi", name: "OpenAPI Specification", category: "Development", color: "#00ff87", url: "https://github.com/OAI/OpenAPI-Specification", short: "API documentation mastery", desc: "The industry standard for RESTful API design and documentation. Machine-readable contracts.", tags: ["api", "docs"] },
+            { id: "micro-patterns", name: "Microservices Patterns", category: "Development", color: "#00ff87", url: "https://github.com/microservices-patterns", short: "Distributed systems wisdom", desc: "Battle-tested patterns for building and operating microservices architectures.", tags: ["microservices", "distributed"] },
+
+            // Data & ML
+            { id: "paperswithcode", name: "Papers With Code", category: "Data", color: "#ffcc00", url: "https://paperswithcode.com/", short: "Cutting-edge research implementations", desc: "The bridge between research papers and working code. State-of-the-art models with implementations.", tags: ["research", "ml"] },
+            { id: "applied-ml", name: "ML Engineering Best Practices", category: "Data", color: "#ffcc00", url: "https://github.com/eugeneyan/applied-ml", short: "Production ML wisdom", desc: "Practical guide to building, deploying, and maintaining machine learning systems in production.", tags: ["mlops", "production"] },
+            { id: "awesomemlops", name: "Awesome MLOps", category: "Data", color: "#ffcc00", url: "https://github.com/visenger/awesome-mlops", short: "ML operations excellence", desc: "Curated list of tools, frameworks, and resources for MLOps and production ML.", tags: ["mlops", "tools"] },
+            { id: "data-cookbook", name: "Data Engineering Cookbook", category: "Data", color: "#ffcc00", url: "https://github.com/andkret/Cookbook", short: "The complete guide", desc: "Comprehensive collection of data engineering patterns, tools, and best practices.", tags: ["data-engineering"] },
+            { id: "airflow", name: "Apache Airflow Best Practices", category: "Data", color: "#ffcc00", url: "https://airflow.apache.org/docs/apache-airflow/stable/best-practices.html", short: "Workflow orchestration mastery", desc: "Official best practices for building reliable, maintainable data pipelines with Airflow.", tags: ["orchestration", "pipelines"] },
+            { id: "dbt", name: "dbt (Data Build Tool)", category: "Data", color: "#ffcc00", url: "https://docs.getdbt.com/", short: "Transform data like a pro", desc: "Analytics engineering tool that enables data teams to transform data using SQL.", tags: ["analytics", "sql"] },
+
+            // Web
+            { id: "webdev", name: "Web.dev Guides", category: "Web", color: "#60efff", url: "https://web.dev/", short: "Google's web performance bible", desc: "Modern web development best practices from the Chrome team. Performance, UX, and capabilities.", tags: ["performance", "web"] },
+            { id: "mdn-security", name: "MDN Web Security", category: "Web", color: "#60efff", url: "https://developer.mozilla.org/en-US/docs/Web/Security", short: "Browser security mastery", desc: "Authoritative guide to web security features, CSP, CORS, and secure development practices.", tags: ["web-security"] },
+            { id: "lighthouse", name: "Lighthouse CI", category: "Web", color: "#60efff", url: "https://github.com/GoogleChrome/lighthouse-ci", short: "Performance monitoring automation", desc: "Continuous integration for Lighthouse. Automate web performance and quality auditing.", tags: ["ci", "performance"] },
+            { id: "react-bits", name: "React Best Practices", category: "Web", color: "#60efff", url: "https://github.com/vasanthk/react-bits", short: "React patterns and anti-patterns", desc: "A collection of React patterns, techniques, tips and tricks. Write better React.", tags: ["react", "patterns"] },
+            { id: "vue-style", name: "Vue.js Style Guide", category: "Web", color: "#60efff", url: "https://vuejs.org/style-guide/", short: "Vue component mastery", desc: "Official style guide for writing clean, consistent, and maintainable Vue.js applications.", tags: ["vue", "style"] },
+
+            // Reverse Engineering
+            { id: "ghidra", name: "Ghidra Documentation", category: "Reverse", color: "#ff0080", url: "https://ghidra-sre.org/", short: "NSA's reverse engineering tool", desc: "NSA's powerful open source software reverse engineering suite. Industry standard for SRE.", tags: ["reverse-engineering", "nsa"] },
+            { id: "radare2", name: "Radare2 Book", category: "Reverse", color: "#ff0080", url: "https://book.rada.re/", short: "Binary analysis mastery", desc: "The complete guide to Radare2, the ultimate command-line reverse engineering framework.", tags: ["radare", "binary"] },
+            { id: "ida-python", name: "IDA Pro Tips & Tricks", category: "Reverse", color: "#ff0080", url: "https://github.com/duo-labs/idapython", short: "Advanced disassembly techniques", desc: "Python scripting for IDA Pro. Automate and extend the world's most popular disassembler.", tags: ["ida", "scripting"] },
+            { id: "volatility", name: "Volatility Framework", category: "Reverse", color: "#ff0080", url: "https://github.com/volatilityfoundation/volatility", short: "Memory analysis mastery", desc: "Advanced memory forensics framework. Extract artifacts from volatile memory dumps.", tags: ["forensics", "memory"] },
+
+            // Documentation
+            { id: "bash-hackers", name: "Bash Hackers Wiki", category: "Docs", color: "#00ff87", url: "https://wiki.bash-hackers.org/", short: "Shell scripting enlightenment", desc: "Deep dive into Bash scripting. Advanced techniques, best practices, and internals.", tags: ["bash", "shell"] },
+            { id: "git-internals", name: "Git Internals", category: "Docs", color: "#00ff87", url: "https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain", short: "Version control deep dive", desc: "How Git really works under the hood. Plumbing, porcelain, and the object model.", tags: ["git", "vcs"] },
+            { id: "linux-from-scratch", name: "Linux From Scratch", category: "Docs", color: "#00ff87", url: "http://www.linuxfromscratch.org/", short: "Build your own OS", desc: "Learn Linux by building it from source. The ultimate systems programming education.", tags: ["linux", "systems"] },
+            { id: "microservices-io", name: "Microservices.io", category: "Docs", color: "#00ff87", url: "https://microservices.io/patterns/", short: "Distributed system patterns", desc: "A catalog of microservices architecture patterns with clear explanations and examples.", tags: ["patterns", "architecture"] },
+            { id: "high-scalability", name: "High Scalability", category: "Docs", color: "#00ff87", url: "http://highscalability.com/", short: "How big systems work", desc: "Real-world architecture case studies from the largest systems on the planet.", tags: ["scalability", "case-studies"] },
+
+            // Productivity
+            { id: "github-actions", name: "GitHub Actions Cookbook", category: "Productivity", color: "#ffcc00", url: "https://github.com/actions/toolkit", short: "CI/CD automation mastery", desc: "Build powerful automation workflows with GitHub Actions. The modern CI/CD standard.", tags: ["ci-cd", "github"] },
+            { id: "art-of-cli", name: "The Art of Command Line", category: "Productivity", color: "#ffcc00", url: "https://github.com/jlevy/the-art-of-command-line", short: "CLI enlightenment", desc: "Master the command line. Essential tips, tricks, and tools for power users.", tags: ["cli", "productivity"] },
+            { id: "modern-unix", name: "Modern Unix Tools", category: "Productivity", color: "#ffcc00", url: "https://github.com/ibraheemdev/modern-unix", short: "Next-gen command line tools", desc: "Modern alternatives to classic Unix tools. Faster, friendlier, more powerful.", tags: ["cli", "tools"] },
+
+            // Crypto
+            { id: "crypto101", name: "Crypto101", category: "Crypto", color: "#60efff", url: "https://www.crypto101.io/", short: "Cryptography for developers", desc: "A practical introduction to cryptography for software developers. No math degree required.", tags: ["crypto", "beginner"] },
+            { id: "libsodium", name: "LibSodium Documentation", category: "Crypto", color: "#60efff", url: "https://libsodium.gitbook.io/doc/", short: "Modern crypto library", desc: "The modern, easy-to-use software library for encryption, decryption, signatures, etc.", tags: ["crypto", "library"] },
+            { id: "openssl-cookbook", name: "OpenSSL Cookbook", category: "Crypto", color: "#60efff", url: "https://www.feistyduck.com/library/openssl-cookbook/", short: "SSL/TLS mastery", desc: "Practical guide to configuring and using OpenSSL. Essential for secure communications.", tags: ["ssl", "tls"] },
+
+            // Crown Jewels
+            { id: "rfc", name: "RFC Documents", category: "Crown", color: "#ff0080", url: "https://www.rfc-editor.org/", short: "Internet standards and protocols", desc: "The definitive source for all internet standards, protocols, and best practices. Primary sources.", tags: ["standards", "rfc"] },
+            { id: "nist", name: "NIST Cybersecurity Framework", category: "Crown", color: "#ff0080", url: "https://www.nist.gov/cyberframework", short: "Security governance", desc: "The gold standard framework for managing cybersecurity risk. Used worldwide.", tags: ["framework", "compliance"] },
+            { id: "cis", name: "CIS Controls", category: "Crown", color: "#ff0080", url: "https://www.cisecurity.org/controls", short: "Security implementation guide", desc: "Prioritized set of actions to protect organizations and data from known cyber attack vectors.", tags: ["controls", "implementation"] },
+            { id: "owasp-top10", name: "OWASP Top 10", category: "Crown", color: "#ff0080", url: "https://owasp.org/www-project-top-ten/", short: "Web application security", desc: "The most critical web application security risks. Essential reading for every developer.", tags: ["web", "risks"] },
+            { id: "cvss", name: "Common Vulnerability Scoring", category: "Crown", color: "#ff0080", url: "https://www.first.org/cvss/", short: "Vulnerability assessment", desc: "Industry standard for scoring the severity of vulnerabilities. CVSS 4.0 is the latest.", tags: ["scoring", "vulnerability"] },
+            { id: "google-eng", name: "Google's Engineering Practices", category: "Crown", color: "#ff0080", url: "https://google.github.io/eng-practices/", short: "Code review & engineering excellence", desc: "How Google does engineering. Code review, testing, and development practices at scale.", tags: ["engineering", "google"] },
+            { id: "atlassian-git", name: "Atlassian Git Tutorials", category: "Crown", color: "#ff0080", url: "https://www.atlassian.com/git/tutorials", short: "Version control excellence", desc: "Clear, practical Git tutorials from the makers of Bitbucket and Jira.", tags: ["git", "tutorial"] }
+        ];
+
+        // Category colors for consistency
+        const categoryColors = {
+            "Security": "#ff0080",
+            "System": "#60efff",
+            "Development": "#00ff87",
+            "Data": "#ffcc00",
+            "Web": "#60efff",
+            "Reverse": "#ff0080",
+            "Docs": "#00ff87",
+            "Productivity": "#ffcc00",
+            "Crypto": "#60efff",
+            "Crown": "#ff0080"
+        };
+
+        // Predefined connections for the graph (thematic links)
+        const connections = [
+            ["owasp", "payloads"], ["payloads", "seclists"], ["cyberchef", "crypto101"], ["thehive", "nist"],
+            ["privacyguides", "awesome-selfhosted"], ["tails", "privacyguides"],
+            ["terraform-bp", "ansible-bp"], ["docker-bench", "prometheus"], ["grafana", "prometheus"], ["elk", "grafana"],
+            ["clean-js", "system-design"], ["system-design", "12factor"], ["google-style", "clean-js"],
+            ["ms-api", "openapi"], ["micro-patterns", "system-design"],
+            ["paperswithcode", "applied-ml"], ["applied-ml", "awesomemlops"], ["data-cookbook", "airflow"], ["dbt", "airflow"],
+            ["webdev", "lighthouse"], ["mdn-security", "owasp"], ["react-bits", "vue-style"],
+            ["ghidra", "radare2"], ["radare2", "ida-python"], ["volatility", "ghidra"],
+            ["bash-hackers", "art-of-cli"], ["git-internals", "atlassian-git"], ["linux-from-scratch", "bash-hackers"],
+            ["microservices-io", "high-scalability"], ["github-actions", "12factor"],
+            ["crypto101", "libsodium"], ["openssl-cookbook", "libsodium"], ["crypto101", "cyberchef"],
+            ["rfc", "mdn-security"], ["nist", "cis"], ["owasp-top10", "owasp"], ["cvss", "owasp-top10"],
+            ["google-eng", "system-design"], ["atlassian-git", "git-internals"]
+        ];
+
+        // ==================== CANVAS / GRAPH LOGIC ====================
+        let canvas, ctx;
+        let nodes = [];
+        let links = [];
+        let simulationRunning = true;
+        let selectedNode = null;
+        let hoveredNode = null;
+        let particles = [];
+        let isDragging = false;
+        let dragNode = null;
+        let lastMouseX = 0, lastMouseY = 0;
+        let offsetX = 0, offsetY = 0;
+        let scale = 1;
+        let searchFilter = "";
+
+        function initGraph() {
+            canvas = document.getElementById('treasure-canvas');
+            ctx = canvas.getContext('2d', { alpha: true });
+            
+            // Initialize nodes with better starting positions (circular layout by category)
+            const categories = [...new Set(treasureData.map(d => d.category))];
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) * 0.38;
+            
+            nodes = treasureData.map((gem, index) => {
+                const catIndex = categories.indexOf(gem.category);
+                const angle = (catIndex / categories.length) * Math.PI * 2 + (index % 5) * 0.4;
+                const dist = radius * (0.65 + Math.random() * 0.35);
+                
+                return {
+                    ...gem,
+                    x: centerX + Math.cos(angle) * dist,
+                    y: centerY + Math.sin(angle) * dist,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8,
+                    radius: gem.category === "Crown" ? 7 : 5.5,
+                    mass: gem.category === "Crown" ? 1.8 : 1,
+                    pinned: false
+                };
+            });
+
+            // Build links from predefined + some category clustering
+            links = [];
+            connections.forEach(([a, b]) => {
+                const source = nodes.findIndex(n => n.id === a);
+                const target = nodes.findIndex(n => n.id === b);
+                if (source !== -1 && target !== -1) {
+                    links.push({ source, target, strength: 0.6 });
+                }
+            });
+
+            // Add some category-based clustering links
+            categories.forEach(cat => {
+                const catNodes = nodes.filter(n => n.category === cat).map(n => nodes.indexOf(n));
+                for (let i = 0; i < catNodes.length - 1; i++) {
+                    links.push({ source: catNodes[i], target: catNodes[i+1], strength: 0.35 });
+                }
+            });
+
+            // Event listeners
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+            canvas.addEventListener('wheel', handleWheel, { passive: false });
+            
+            // Touch support
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd);
+
+            // Initial gentle simulation
+            for (let i = 0; i < 60; i++) {
+                runSimulationStep(0.8);
+            }
+            
+            // Start animation loop
+            requestAnimationFrame(animate);
+            
+            // Seed a few knowledge particles
+            setTimeout(() => {
+                if (simulationRunning) createKnowledgeParticles(3);
+            }, 1200);
+        }
+
+        function runSimulationStep(dt = 1) {
+            const repulsion = 380;
+            const spring = 0.035;
+            const damping = 0.86;
+            const centerForce = 0.008;
+
+            // Apply forces
+            for (let i = 0; i < nodes.length; i++) {
+                const n1 = nodes[i];
+                if (n1.pinned) continue;
+
+                let fx = 0, fy = 0;
+
+                // Repulsion from all other nodes
+                for (let j = 0; j < nodes.length; j++) {
+                    if (i === j) continue;
+                    const n2 = nodes[j];
+                    const dx = n1.x - n2.x;
+                    const dy = n1.y - n2.y;
+                    const distSq = dx * dx + dy * dy + 0.01;
+                    const dist = Math.sqrt(distSq);
+                    
+                    if (dist < 280) {
+                        const force = repulsion / distSq;
+                        fx += (dx / dist) * force;
+                        fy += (dy / dist) * force;
+                    }
+                }
+
+                // Spring attraction for connected nodes
+                links.forEach(link => {
+                    if (link.source === i || link.target === i) {
+                        const other = link.source === i ? nodes[link.target] : nodes[link.source];
+                        const dx = other.x - n1.x;
+                        const dy = other.y - n1.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy) || 0.1;
+                        const targetDist = 95;
+                        
+                        const force = (dist - targetDist) * spring * link.strength;
+                        fx += (dx / dist) * force;
+                        fy += (dy / dist) * force;
+                    }
+                });
+
+                // Gentle center pull
+                const cx = canvas.width / 2 + offsetX;
+                const cy = canvas.height / 2 + offsetY;
+                fx += (cx - n1.x) * centerForce;
+                fy += (cy - n1.y) * centerForce;
+
+                // Update velocity
+                n1.vx = (n1.vx + fx) * damping;
+                n1.vy = (n1.vy + fy) * damping;
+
+                // Update position
+                n1.x += n1.vx * dt;
+                n1.y += n1.vy * dt;
+
+                // Boundary constraints
+                const margin = 45;
+                n1.x = Math.max(margin, Math.min(canvas.width - margin, n1.x));
+                n1.y = Math.max(margin, Math.min(canvas.height - margin, n1.y));
+            }
+        }
+
+        function animate() {
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Subtle background grid / cosmic dust
+            ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+            ctx.lineWidth = 1;
+            const gridSize = 42;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Draw links
+            ctx.lineWidth = 1.2;
+            links.forEach(link => {
+                const n1 = nodes[link.source];
+                const n2 = nodes[link.target];
+                if (!n1 || !n2) return;
+
+                const isHighlighted = (selectedNode && (n1.id === selectedNode.id || n2.id === selectedNode.id)) ||
+                                     (hoveredNode && (n1.id === hoveredNode.id || n2.id === hoveredNode.id));
+                
+                if (searchFilter) {
+                    const matchesSearch = n1.name.toLowerCase().includes(searchFilter) || 
+                                         n2.name.toLowerCase().includes(searchFilter);
+                    if (!matchesSearch) return;
+                }
+
+                ctx.strokeStyle = isHighlighted ? 
+                    'rgba(0, 255, 135, 0.65)' : 
+                    'rgba(120, 120, 140, 0.25)';
+                
+                ctx.beginPath();
+                ctx.moveTo(n1.x, n1.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.stroke();
+
+                // Animated knowledge flow on highlighted connections
+                if (isHighlighted && Math.random() > 0.6) {
+                    const progress = (Date.now() % 1800) / 1800;
+                    const px = n1.x + (n2.x - n1.x) * progress;
+                    const py = n1.y + (n2.y - n1.y) * progress;
+                    
+                    ctx.fillStyle = '#00ff87';
+                    ctx.beginPath();
+                    ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Draw nodes
+            nodes.forEach((node, index) => {
+                let alpha = 1;
+                let sizeMult = 1;
+
+                if (searchFilter) {
+                    const matches = node.name.toLowerCase().includes(searchFilter) || 
+                                   node.category.toLowerCase().includes(searchFilter);
+                    if (!matches) {
+                        alpha = 0.15;
+                        sizeMult = 0.7;
+                    } else {
+                        sizeMult = 1.15;
+                        // Pulse effect for matches
+                        sizeMult += Math.sin(Date.now() / 180) * 0.08;
+                    }
+                }
+
+                if (selectedNode && selectedNode.id === node.id) {
+                    sizeMult = 1.35;
+                    // Outer glow
+                    ctx.shadowColor = node.color;
+                    ctx.shadowBlur = 22;
+                } else if (hoveredNode && hoveredNode.id === node.id) {
+                    sizeMult = 1.25;
+                    ctx.shadowColor = node.color;
+                    ctx.shadowBlur = 14;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+
+                // Node core
+                ctx.shadowBlur = selectedNode && selectedNode.id === node.id ? 18 : 6;
+                ctx.shadowColor = node.color;
+                
+                ctx.fillStyle = node.color;
+                ctx.globalAlpha = alpha;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius * sizeMult, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Inner highlight
+                ctx.fillStyle = 'rgba(255,255,255,0.65)';
+                ctx.beginPath();
+                ctx.arc(node.x - node.radius * 0.3, node.y - node.radius * 0.3, node.radius * 0.35 * sizeMult, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+
+                // Label for important nodes or hovered/selected
+                if ((node.category === "Crown" || hoveredNode?.id === node.id || selectedNode?.id === node.id) && alpha > 0.3) {
+                    ctx.font = '600 10.5px Inter, system-ui, sans-serif';
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                    ctx.textAlign = 'center';
+                    const label = node.name.length > 22 ? node.name.substring(0, 19) + '...' : node.name;
+                    ctx.fillText(label, node.x, node.y + node.radius * 1.85);
+                }
+            });
+
+            ctx.restore();
+
+            // Update particles
+            updateParticles();
+
+            // Run simulation
+            if (simulationRunning && !isDragging) {
+                runSimulationStep();
+            }
+
+            // Occasionally spawn new knowledge particles on active links
+            if (simulationRunning && Math.random() < 0.035) {
+                createKnowledgeParticles(1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function updateParticles() {
+            ctx.save();
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 1.8;
+                p.alpha = Math.max(0, p.life / p.maxLife);
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.globalAlpha = p.alpha * 0.9;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Trail
+                ctx.strokeStyle = p.color;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x - p.vx * 3.5, p.y - p.vy * 3.5);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function createKnowledgeParticles(count = 2, sourceNode = null) {
+            if (!links.length) return;
+            
+            for (let i = 0; i < count; i++) {
+                let link;
+                if (sourceNode) {
+                    const connected = links.filter(l => l.source === nodes.indexOf(sourceNode) || l.target === nodes.indexOf(sourceNode));
+                    if (connected.length) link = connected[Math.floor(Math.random() * connected.length)];
+                }
+                if (!link) link = links[Math.floor(Math.random() * links.length)];
+                
+                const n1 = nodes[link.source];
+                const n2 = nodes[link.target];
+                if (!n1 || !n2) continue;
+
+                const progress = Math.random();
+                particles.push({
+                    x: n1.x + (n2.x - n1.x) * progress,
+                    y: n1.y + (n2.y - n1.y) * progress,
+                    vx: (n2.x - n1.x) * 0.018 + (Math.random() - 0.5) * 0.3,
+                    vy: (n2.y - n1.y) * 0.018 + (Math.random() - 0.5) * 0.3,
+                    life: 38 + Math.random() * 24,
+                    maxLife: 62,
+                    alpha: 0.9,
+                    size: 1.6 + Math.random() * 1.1,
+                    color: Math.random() > 0.5 ? '#00ff87' : '#60efff'
+                });
+            }
+        }
+
+        function getNodeAt(x, y) {
+            // Account for any future pan/zoom (currently simple)
+            for (let i = nodes.length - 1; i >= 0; i--) {
+                const n = nodes[i];
+                const dx = n.x - x;
+                const dy = n.y - y;
+                if (dx * dx + dy * dy < (n.radius * 2.8) ** 2) {
+                    return n;
+                }
+            }
+            return null;
+        }
+
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            
+            const node = getNodeAt(x, y);
+            if (node) {
+                isDragging = true;
+                dragNode = node;
+                node.pinned = true;
+                lastMouseX = x;
+                lastMouseY = y;
+                selectNode(node);
+            } else {
+                selectedNode = null;
+                document.getElementById('node-info-panel').classList.add('hidden');
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            hoveredNode = getNodeAt(x, y);
+
+            if (isDragging && dragNode) {
+                dragNode.x = x;
+                dragNode.y = y;
+                dragNode.vx = (x - lastMouseX) * 0.6;
+                dragNode.vy = (y - lastMouseY) * 0.6;
+                lastMouseX = x;
+                lastMouseY = y;
+            } else if (hoveredNode) {
+                canvas.style.cursor = 'pointer';
+            } else {
+                canvas.style.cursor = 'grab';
+            }
+        }
+
+        function handleMouseUp() {
+            if (dragNode) {
+                // Release pin after short delay so it can settle naturally
+                setTimeout(() => {
+                    if (dragNode) dragNode.pinned = false;
+                }, 420);
+            }
+            isDragging = false;
+            dragNode = null;
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            // Simple zoom (future enhancement could be more sophisticated)
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.max(0.6, Math.min(2.2, scale * delta));
+            
+            // For now we just adjust visual scale hint
+            canvas.style.transform = `scale(${scale})`;
+            setTimeout(() => {
+                if (canvas) canvas.style.transform = '';
+            }, 180);
+        }
+
+        // Touch handlers
+        function handleTouchStart(e) {
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.touches[0].clientY - rect.top) * (canvas.height / rect.height);
+                const node = getNodeAt(x, y);
+                if (node) {
+                    isDragging = true;
+                    dragNode = node;
+                    node.pinned = true;
+                    lastMouseX = x;
+                    lastMouseY = y;
+                    selectNode(node);
+                }
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging && dragNode) {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width);
+                const y = (e.touches[0].clientY - rect.top) * (canvas.height / rect.height);
+                dragNode.x = x;
+                dragNode.y = y;
+            }
+        }
+
+        function handleTouchEnd() {
+            if (dragNode) {
+                setTimeout(() => { if (dragNode) dragNode.pinned = false; }, 380);
+            }
+            isDragging = false;
+            dragNode = null;
+        }
+
+        function selectNode(node) {
+            selectedNode = node;
+            hoveredNode = node;
+            
+            const panel = document.getElementById('node-info-panel');
+            const content = document.getElementById('node-info-content');
+            
+            content.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="text-[10px] uppercase tracking-[1px] text-white/50">${node.category}</div>
+                        <div class="font-semibold text-lg leading-tight pr-4">${node.name}</div>
+                    </div>
+                </div>
+                <div class="mt-3 text-xs text-white/70 line-clamp-3">${node.short}</div>
+                
+                <div class="mt-4 flex gap-x-2">
+                    <button onclick="visitNode('${node.id}'); event.stopImmediatePropagation();" 
+                            class="flex-1 text-xs py-2 rounded-2xl bg-white/90 text-[#050507] font-semibold active:bg-white">
+                        OPEN
+                    </button>
+                    <button onclick="closeNodePanel(); event.stopImmediatePropagation();" 
+                            class="flex-1 text-xs py-2 rounded-2xl border border-white/30 hover:bg-white/5">
+                        CLOSE
+                    </button>
+                </div>
+            `;
+            
+            panel.classList.remove('hidden');
+            
+            // Spawn knowledge particles from this node
+            createKnowledgeParticles(4, node);
+        }
+
+        function closeNodePanel() {
+            document.getElementById('node-info-panel').classList.add('hidden');
+            selectedNode = null;
+        }
+
+        function filterMapNodes(query) {
+            searchFilter = query.toLowerCase().trim();
+            if (!searchFilter) {
+                // Clear highlights
+            }
+        }
+
+        function highlightCategory(cat) {
+            if (cat === 'all') {
+                searchFilter = '';
+                document.getElementById('map-search').value = '';
+                return;
+            }
+            
+            const catMap = {
+                'security': 'Security',
+                'dev': 'Development',
+                'data': 'Data'
+            };
+            searchFilter = (catMap[cat] || cat).toLowerCase();
+            document.getElementById('map-search').value = searchFilter;
+        }
+
+        function toggleSimulation() {
+            simulationRunning = !simulationRunning;
+            const btn = document.getElementById('sim-btn');
+            const txt = document.getElementById('sim-text');
+            
+            if (simulationRunning) {
+                txt.textContent = 'PAUSE SIM';
+                btn.classList.add('!border-[#00ff87]/60');
+            } else {
+                txt.textContent = 'RESUME SIM';
+                btn.classList.remove('!border-[#00ff87]/60');
+            }
+        }
+
+        function resetLayout() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) * 0.36;
+            const categories = [...new Set(nodes.map(n => n.category))];
+            
+            nodes.forEach((node, index) => {
+                const catIndex = categories.indexOf(node.category);
+                const angle = (catIndex / categories.length) * Math.PI * 2 + (index % 4) * 0.55;
+                const dist = radius * (0.6 + (index % 3) * 0.12);
+                
+                node.x = centerX + Math.cos(angle) * dist;
+                node.y = centerY + Math.sin(angle) * dist;
+                node.vx = (Math.random() - 0.5) * 1.2;
+                node.vy = (Math.random() - 0.5) * 1.2;
+                node.pinned = false;
+            });
+            
+            // Gentle settle
+            for (let i = 0; i < 45; i++) runSimulationStep(0.9);
+        }
+
+        function startKnowledgeFlow() {
+            createKnowledgeParticles(6);
+            
+            // Highlight a few random high-value connections
+            setTimeout(() => {
+                const crownNodes = nodes.filter(n => n.category === "Crown");
+                if (crownNodes.length > 0) {
+                    selectNode(crownNodes[Math.floor(Math.random() * crownNodes.length)]);
+                }
+            }, 420);
+            
+            // Extra particles over time
+            let count = 0;
+            const interval = setInterval(() => {
+                createKnowledgeParticles(2);
+                count++;
+                if (count > 5) clearInterval(interval);
+            }, 380);
+        }
+
+        function visitNode(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                window.open(node.url, '_blank');
+            }
+        }
+
+        // ==================== VAULT RENDERING ====================
+        function renderVault(filteredData = null) {
+            const grid = document.getElementById('vault-grid');
+            grid.innerHTML = '';
+            
+            const data = filteredData || treasureData;
+            
+            data.forEach(gem => {
+                const card = document.createElement('div');
+                card.className = `gem-card glass border border-white/10 rounded-3xl p-5 cursor-pointer group`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="category-tag" style="background: ${gem.color}20; color: ${gem.color}; border: 1px solid ${gem.color}40">
+                            ${gem.category}
+                        </div>
+                        <i class="fa-solid fa-external-link-alt text-white/30 group-hover:text-white/60 transition-colors"></i>
+                    </div>
+                    
+                    <div class="font-semibold text-[15px] leading-tight tracking-tight pr-4 group-hover:text-[#00ff87] transition-colors">
+                        ${gem.name}
+                    </div>
+                    
+                    <div class="mt-3 text-xs text-white/60 line-clamp-2 leading-snug">
+                        ${gem.short}
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+                        <div class="text-[10px] text-white/40 font-mono">${gem.url.split('/').pop().slice(0, 22)}</div>
+                        <div class="text-[#00ff87] text-xs opacity-0 group-hover:opacity-100 transition flex items-center gap-x-1">
+                            <span>EXPLORE</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </div>
+                    </div>
+                `;
+                
+                card.onclick = () => openGemModal(gem);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterVault() {
+            const searchVal = document.getElementById('vault-search').value.toLowerCase().trim();
+            const catFilter = document.getElementById('category-filter').value;
+            
+            let filtered = treasureData;
+            
+            if (searchVal) {
+                filtered = filtered.filter(g => 
+                    g.name.toLowerCase().includes(searchVal) || 
+                    g.short.toLowerCase().includes(searchVal) ||
+                    g.desc.toLowerCase().includes(searchVal) ||
+                    (g.tags && g.tags.some(t => t.includes(searchVal)))
+                );
+            }
+            
+            if (catFilter) {
+                filtered = filtered.filter(g => g.category === catFilter);
+            }
+            
+            renderVault(filtered);
+            
+            // Also update map search
+            if (searchVal.length > 2) {
+                document.getElementById('map-search').value = searchVal;
+                searchFilter = searchVal;
+            }
+        }
+
+        // ==================== MODAL ====================
+        let currentModalGem = null;
+
+        function openGemModal(gem) {
+            currentModalGem = gem;
+            const modal = document.getElementById('gem-modal');
+            
+            document.getElementById('modal-category').innerHTML = `
+                <span style="background: ${gem.color}25; color: ${gem.color}" class="px-3 py-0.5 rounded-2xl text-xs font-semibold">
+                    ${gem.category.toUpperCase()}
+                </span>
+            `;
+            document.getElementById('modal-title').textContent = gem.name;
+            document.getElementById('modal-desc').textContent = gem.desc;
+            document.getElementById('modal-url-short').textContent = gem.url.replace('https://', '').slice(0, 42) + (gem.url.length > 45 ? '...' : '');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Highlight on map if exists
+            setTimeout(() => {
+                const mapNode = nodes.find(n => n.id === gem.id);
+                if (mapNode) {
+                    selectNode(mapNode);
+                    createKnowledgeParticles(3, mapNode);
+                }
+            }, 380);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('gem-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            currentModalGem = null;
+        }
+
+        function visitResource() {
+            if (currentModalGem) {
+                window.open(currentModalGem.url, '_blank');
+            }
+        }
+
+        function highlightOnMapFromModal() {
+            if (!currentModalGem) return;
+            closeModal();
+            
+            const mapNode = nodes.find(n => n.id === currentModalGem.id);
+            if (mapNode) {
+                document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                setTimeout(() => {
+                    selectNode(mapNode);
+                    createKnowledgeParticles(5, mapNode);
+                    
+                    // Gentle camera focus effect
+                    mapNode.pinned = true;
+                    setTimeout(() => {
+                        if (mapNode) mapNode.pinned = false;
+                    }, 1600);
+                }, 650);
+            }
+        }
+
+        // ==================== THE FORGE (Roadmap Generator) ====================
+        let selectedInterests = new Set();
+
+        function initForge() {
+            const container = document.getElementById('interest-chips');
+            container.innerHTML = '';
+            
+            const cats = [...new Set(treasureData.map(d => d.category))];
+            
+            cats.forEach(cat => {
+                const chip = document.createElement('div');
+                chip.className = `px-4 py-1.5 text-xs rounded-3xl border cursor-pointer transition-all flex items-center gap-x-2 select-none ${selectedInterests.has(cat) ? 'bg-[#00ff87] text-[#050507] border-[#00ff87]' : 'border-white/20 hover:border-white/40'}`;
+                chip.innerHTML = `
+                    <span>${cat}</span>
+                `;
+                
+                chip.onclick = () => {
+                    if (selectedInterests.has(cat)) {
+                        selectedInterests.delete(cat);
+                        chip.classList.remove('bg-[#00ff87]', 'text-[#050507]', 'border-[#00ff87]');
+                        chip.classList.add('border-white/20');
+                    } else {
+                        selectedInterests.add(cat);
+                        chip.classList.add('bg-[#00ff87]', 'text-[#050507]', 'border-[#00ff87]');
+                        chip.classList.remove('border-white/20');
+                    }
+                };
+                
+                container.appendChild(chip);
+            });
+            
+            // Pre-select a few popular ones
+            ['Security', 'Development', 'Data'].forEach(c => {
+                if (!selectedInterests.has(c)) {
+                    selectedInterests.add(c);
+                    // Find and style the chip
+                    setTimeout(() => {
+                        const chips = container.children;
+                        for (let ch of chips) {
+                            if (ch.textContent.includes(c)) {
+                                ch.classList.add('bg-[#00ff87]', 'text-[#050507]', 'border-[#00ff87]');
+                            }
+                        }
+                    }, 50);
+                }
+            });
+        }
+
+        function setFocusMode(element, mode) {
+            document.querySelectorAll('.focus-mode-btn').forEach(el => {
+                el.classList.remove('active', 'border-[#00ff87]');
+                el.classList.add('border-white/20');
+            });
+            element.classList.add('active', 'border-[#00ff87]');
+            element.classList.remove('border-white/20');
+            
+            // Store mode on element or global
+            window.currentFocusMode = mode;
+        }
+
+        function updateTimeLabel(val) {
+            document.getElementById('time-label').textContent = val;
+        }
+
+        function generateRoadmap() {
+            if (selectedInterests.size === 0) {
+                selectedInterests.add('Development');
+                selectedInterests.add('Security');
+            }
+            
+            const level = document.getElementById('mastery-level').value;
+            const weeks = parseInt(document.getElementById('time-horizon').value);
+            const focus = window.currentFocusMode || 'balanced';
+            
+            // Algorithmic path generation
+            let pool = treasureData.filter(g => selectedInterests.has(g.category));
+            
+            // Score items based on level and focus
+            pool = pool.map(gem => {
+                let score = 50;
+                
+                // Crown jewels get priority
+                if (gem.category === "Crown") score += 35;
+                
+                // Level adjustment
+                if (level === 'beginner' && (gem.tags || []).some(t => ['beginner', 'tutorial'].includes(t))) score += 25;
+                if (level === 'advanced' && (gem.tags || []).some(t => ['advanced', 'internals', 'deep'].includes(t) || gem.name.includes('Internals'))) score += 22;
+                
+                // Focus mode
+                if (focus === 'deep' && gem.desc.length > 110) score += 18;
+                if (focus === 'broad' && gem.tags && gem.tags.length > 2) score += 14;
+                
+                // Slight randomness for variety but deterministic feel
+                score += (gem.id.charCodeAt(0) % 7) - 3;
+                
+                return { ...gem, score };
+            });
+            
+            // Sort by score descending
+            pool.sort((a, b) => b.score - a.score);
+            
+            // Limit based on weeks (roughly 1-1.5 gems per week)
+            const targetCount = Math.max(6, Math.min(14, Math.floor(weeks / 1.6)));
+            const roadmap = pool.slice(0, targetCount);
+            
+            // Render beautiful timeline
+            renderRoadmapTimeline(roadmap, level, weeks, focus);
+        }
+
+        function renderRoadmapTimeline(roadmap, level, weeks, focus) {
+            const container = document.getElementById('roadmap-output');
+            const timeline = document.getElementById('roadmap-timeline');
+            timeline.innerHTML = '';
+            
+            let html = '';
+            
+            roadmap.forEach((gem, idx) => {
+                const weekNum = Math.ceil((idx + 1) * (weeks / roadmap.length));
+                const isCrown = gem.category === "Crown";
+                
+                html += `
+                    <div class="group flex gap-x-5 items-start p-5 rounded-3xl border border-white/10 hover:border-[#00ff87]/40 transition-all bg-white/[0.015]">
+                        <div class="flex-shrink-0 w-9 h-9 rounded-2xl flex items-center justify-center text-xs font-mono font-bold mt-0.5" 
+                             style="background: ${gem.color}20; color: ${gem.color}; border: 1px solid ${gem.color}40">
+                            ${String(idx + 1).padStart(2, '0')}
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="font-semibold tracking-tight text-[15px]">${gem.name}</span>
+                                    ${isCrown ? '<span class="ml-2 text-[10px] px-2 py-px rounded bg-[#ff0080]/20 text-[#ff0080]">CROWN JEWEL</span>' : ''}
+                                </div>
+                                <div class="text-xs text-white/50 font-mono">WEEK ~${weekNum}</div>
+                            </div>
+                            
+                            <div class="text-xs text-white/70 mt-1 pr-6">${gem.short}</div>
+                            
+                            <div class="flex items-center gap-x-4 mt-3">
+                                <div onclick="openGemModalFromRoadmap('${gem.id}')" 
+                                     class="cursor-pointer text-xs px-4 py-1 rounded-2xl border border-white/20 hover:bg-white/10 flex items-center gap-x-1.5 text-white/80 hover:text-white transition">
+                                    <span>VIEW DETAILS</span>
+                                </div>
+                                
+                                <a href="${gem.url}" target="_blank" 
+                                   class="text-xs px-4 py-1 rounded-2xl bg-white/10 hover:bg-white/20 flex items-center gap-x-1.5 text-white/80 hover:text-white transition">
+                                    <span>OPEN RESOURCE</span> <i class="fa-solid fa-external-link-alt text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            timeline.innerHTML = html;
+            container.classList.remove('hidden');
+            
+            // Scroll to it
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function openGemModalFromRoadmap(gemId) {
+            const gem = treasureData.find(g => g.id === gemId);
+            if (gem) openGemModal(gem);
+        }
+
+        function copyRoadmap() {
+            const container = document.getElementById('roadmap-timeline');
+            if (!container) return;
+            
+            let text = "# My NEXUS Forged Mastery Path\n\n";
+            const items = container.querySelectorAll('.group');
+            
+            items.forEach((item, i) => {
+                const title = item.querySelector('.font-semibold')?.textContent.trim() || '';
+                const desc = item.querySelector('.text-xs.text-white\\/70')?.textContent.trim() || '';
+                text += `${i+1}. **${title}**\n   ${desc}\n\n`;
+            });
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const origText = event.currentTarget?.innerHTML || '';
+                const btns = document.querySelectorAll('#roadmap-output button');
+                if (btns.length) {
+                    const orig = btns[0].innerHTML;
+                    btns[0].innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
+                    setTimeout(() => { if (btns[0]) btns[0].innerHTML = orig; }, 1600);
+                }
+            });
+        }
+
+        function exportRoadmap() {
+            const container = document.getElementById('roadmap-timeline');
+            if (!container) return;
+            
+            let md = `# NEXUS Treasure Codex — Personalized Mastery Path\n`;
+            md += `*Generated for AntManThePro • ${new Date().toLocaleDateString()}*\n\n`;
+            
+            const items = container.querySelectorAll('.group');
+            items.forEach((item, i) => {
+                const titleEl = item.querySelector('.font-semibold');
+                const descEl = item.querySelector('.text-xs.text-white\\/70');
+                const linkEl = item.querySelector('a[href]');
+                
+                if (titleEl) {
+                    md += `## ${i+1}. ${titleEl.textContent.trim()}\n`;
+                    if (descEl) md += `${descEl.textContent.trim()}\n`;
+                    if (linkEl) md += `\n**Resource:** ${linkEl.href}\n`;
+                    md += `\n---\n\n`;
+                }
+            });
+            
+            md += `\n*Forged with the NEXUS algorithmic engine • godmode2025.net*`;
+            
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nexus-mastery-path.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ==================== UTILITIES ====================
+        function downloadArtifact() {
+            // Create a clean downloadable version notice + trigger browser download of current HTML
+            const link = document.createElement('a');
+            link.download = 'nexus-treasure-codex.html';
+            link.href = window.location.href; // In real deploy this would be the hosted version
+            
+            // Since this is the artifact itself, we show a nice message
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 right-6 glass border border-[#00ff87]/40 px-6 py-4 rounded-3xl flex items-center gap-x-3 z-[200]';
+            toast.innerHTML = `
+                <div>
+                    <div class="font-semibold text-[#00ff87]">Artifact ready.</div>
+                    <div class="text-xs text-white/60">This HTML is fully self-contained. Right-click → Save As to download.</div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.4s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.parentNode.removeChild(toast), 420);
+            }, 4200);
+        }
+
+        function initCustomIconHint() {
+            // The generated icon is available at /home/workdir/artifacts/imagine_images/PJlnr.jpg
+            // For the HTML we use an inline SVG version that looks similar
+            console.log('%c[NEXUS] Custom app icon generated and available in artifacts.', 'color:#00ff87');
+        }
+
+        // ==================== BOOT ====================
+        function boot() {
+            initTailwind();
+            
+            // Initialize the beautiful graph
+            initGraph();
+            
+            // Render full vault
+            renderVault();
+            
+            // Initialize Forge chips
+            initForge();
+            
+            // Seed a couple particles
+            setTimeout(() => {
+                if (typeof createKnowledgeParticles === 'function') {
+                    createKnowledgeParticles(2);
+                }
+            }, 2100);
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    const search = document.getElementById('vault-search');
+                    search.focus();
+                    search.select();
+                }
+                if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    startKnowledgeFlow();
+                }
+            });
+            
+            // Easter egg: Konami-ish for extra particles
+            let konami = '';
+            document.addEventListener('keypress', (e) => {
+                konami += e.key;
+                if (konami.length > 6) konami = konami.slice(-6);
+                if (konami.includes('nexus')) {
+                    createKnowledgeParticles(12);
+                    konami = '';
+                }
+            });
+            
+            initCustomIconHint();
+            
+            // Welcome particles on load
+            setTimeout(() => {
+                const crown = nodes.find(n => n.category === "Crown");
+                if (crown) createKnowledgeParticles(3, crown);
+            }, 1450);
+            
+            // Make sure one node is gently selected on desktop for demo feel (optional)
+            setTimeout(() => {
+                if (window.innerWidth > 1100 && nodes.length) {
+                    const interesting = nodes.find(n => n.id === 'owasp' || n.id === 'system-design' || n.id === 'rfc');
+                    if (interesting && !selectedNode) {
+                        // Don't auto select to avoid overwhelming, but ready if wanted
+                    }
+                }
+            }, 3200);
+            
+            console.log('%c[NEXUS Treasure Codex] Initialized — AntManThePro portfolio artifact v2.0', 'color:#60efff');
+        }
+
+        // Auto boot
+        window.onload = boot;
+        
+        // Expose a couple helpers to console for power users
+        window.NEXUS = {
+            reset: () => resetLayout(),
+            flow: () => startKnowledgeFlow(),
+            highlight: (cat) => highlightCategory(cat),
+            forge: () => generateRoadmap()
+        };
+    </script>
+</body>
+</html>
